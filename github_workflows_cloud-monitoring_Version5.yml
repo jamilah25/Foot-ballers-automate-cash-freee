@@ -1,0 +1,27 @@
+name: Cloud Monitoring Alerts
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
+
+jobs:
+  check-backend-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call AWS ELB Health API
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          pip install awscli
+          aws elbv2 describe-target-health --target-group-arn ${{ secrets.AWS_ELB_TG_ARN }}
+
+      - name: Alert on unhealthy instances
+        run: echo "Set up alerting with AWS CloudWatch or workflow notifications"
+
+  check-frontend-availability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test CloudFront frontend
+        run: curl -sSf https://yourfrontenddomain.com || exit 1

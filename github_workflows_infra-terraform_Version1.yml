@@ -1,0 +1,34 @@
+name: Terraform Infrastructure Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-terraform.yml"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_mongo_public_key: ${{ secrets.MONGO_ATLAS_PUBLIC_KEY }}
+      TF_VAR_mongo_private_key: ${{ secrets.MONGO_ATLAS_PRIVATE_KEY }}
+      TF_VAR_mongo_project_id: ${{ secrets.MONGO_ATLAS_PROJECT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=infra init
+
+      - name: Terraform Plan
+        run: terraform -chdir=infra plan
+
+      - name: Terraform Apply
+        run: terraform -chdir=infra apply -auto-approve

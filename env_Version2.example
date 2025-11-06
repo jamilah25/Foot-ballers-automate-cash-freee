@@ -1,0 +1,3 @@
+DATADOG_API_KEY=your_real_api_key_here
+SENTRY_DSN=your_real_sentry_dsn_here
+NODE_ENV=production

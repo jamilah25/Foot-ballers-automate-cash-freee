@@ -1,0 +1,15 @@
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+input, button {
+  min-width: 120px;
+  padding: 6px;
+}
+@media (max-width: 600px) {
+  input, button {
+    min-width: 90px;
+    font-size: 1em;
+  }
+}

@@ -1,0 +1,30 @@
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - "client/**"
+      - "client/package.json"
+      - ".github/workflows/ci-client.yml"
+  pull_request:
+    paths:
+      - "client/**"
+      - "client/package.json"
+      - ".github/workflows/ci-client.yml"
+
+jobs:
+  build-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: cd client && npm install
+
+      - name: Build frontend
+        run: cd client && npm run build

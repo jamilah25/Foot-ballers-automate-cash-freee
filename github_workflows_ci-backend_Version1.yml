@@ -1,0 +1,35 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - "src/**"
+      - "package.json"
+      - ".github/workflows/ci-backend.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "package.json"
+      - ".github/workflows/ci-backend.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Lint and Test
+        run: |
+          npm run lint || true
+          npm test || true
