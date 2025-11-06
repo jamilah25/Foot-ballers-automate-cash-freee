@@ -22,7 +22,36 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - name: Detect package.json location
+      id: detect
       run: |
-        npm install
-        gulp
+        # Find first package.json tracked by git
+        pkg=$(git ls-files '*package.json' | head -n1 || true)
+        if [ -z "$pkg" ]; then
+          echo "No package.json found in the repository."
+          ls -la
+          echo "::error ::package.json not found. Add package.json to the repo or put the Node project in a subfolder."
+          exit 1
+        fi
+        dir=$(dirname "$pkg")
+        # normalize root dir to "."
+        if [ "$dir" = "." ]; then
+          echo "PKG_DIR=." >> $GITHUB_ENV
+        else
+          echo "PKG_DIR=$dir" >> $GITHUB_ENV
+        fi
+        echo "Found package.json in: $pkg"
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: ${{ env.PKG_DIR }}
+
+    - name: Build (run gulp)
+      run: |
+        # prefer using scripts in package.json
+        if jq -e '.scripts.build' ${{ env.PKG_DIR }}/package.json >/dev/null 2>&1; then
+          npm run build
+        else
+          npx gulp
+        fi
+      working-directory: ${{ env.PKG_DIR }}
